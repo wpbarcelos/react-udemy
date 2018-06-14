@@ -10,9 +10,16 @@ export default props => {
         return(
             list.map( l => (
                 <tr key={l._id}>
-                    <td>{l.description}</td>
-                    <td> <IconButton classe="danger" icon="trash" 
-                        onClick={ () => props.handleRemove(l)} ></IconButton></td>
+                    <td className={ l.done ? 'markAsDone' : ''}>{l.description}</td>
+                    <td> 
+                        <IconButton classe="success" icon="check" 
+                        onClick={ () => props.handleMarkAsDone(l)} hide={l.done}></IconButton> 
+
+                        <IconButton classe="warning" icon="remove" 
+                        onClick={ () => props.handleMarkAsPending(l)} hide={!l.done} ></IconButton> 
+
+                        <IconButton classe="danger" icon="trash" 
+                        onClick={ () => props.handleRemove(l)} hide={!l.done}></IconButton></td>
 
                 </tr>
             ))

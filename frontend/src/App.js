@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
+import './template/custom.css';
 
 import React, { Component } from 'react';
 import Routes from './routes'

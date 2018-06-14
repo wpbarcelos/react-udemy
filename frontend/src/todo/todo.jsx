@@ -18,40 +18,63 @@ export default class Todo extends Component {
         this.handleAdd  = this.handleAdd.bind(this)
         this.handleChange  = this.handleChange.bind(this)
         this.handleRemove  = this.handleRemove.bind(this)
+        this.handleMarkAsDone  = this.handleMarkAsDone.bind(this)
+        this.handleMarkAsPending  = this.handleMarkAsPending.bind(this)
+
+        this.handleSearch  = this.handleSearch.bind(this)
+        
         
         this.refresh();
     }
 
-    refresh()
+    refresh(description='')
     {
-        axios.get(`${URL}?sort=createdAt`)
+        const search = description ? `&description__regex=/${description}/`:''
+
+        axios.get(`${URL}?sort=createdAt${search}`)
             .then( (resp)=>{
-                this.setState({...this.state, list: resp.data })
+                this.setState({...this.state, description, list: resp.data })
             })
+
+    }
+
+    handleSearch(){
+        this.refresh( this.state.description )
     }
 
     handleChange(e){
         this.setState({...this.state, description: e.target.value })
     }
 
+    handleMarkAsDone(todo){
+        axios.put(URL+'/'+todo._id, {done:true})
+            .then((resp)=>{
+                this.refresh(this.state.description );
+            })
+    }
+
+    handleMarkAsPending(todo){
+        axios.put(URL+'/'+todo._id, {done:false})
+            .then((resp)=>{
+                this.refresh(this.state.description );
+            })
+    }
     handleRemove(todo){
-        console.log(todo)
+
         axios.delete(URL+'/'+todo._id)
             .then((resp)=>{
-                console.log(resp)
-                this.refresh();
+                this.refresh(this.state.description );
             })
     }
 
     handleAdd(){
-        console.log(this.state.description);
 
         const description = this.state.description;
 
         axios.post(URL, {description})
             .then((resp)=>{
                 this.setState({...this.state, description: '' })
-                this.refresh();
+                this.refresh('');
 
             });
     }
@@ -64,10 +87,15 @@ export default class Todo extends Component {
                 <TodoForm 
                     description={this.state.description}
                     handleAdd={this.handleAdd}
-                    handleChange={this.handleChange}
+                    handleChange={this.handleChange} 
+                    handleSearch={this.handleSearch} 
                      ></TodoForm>
 
-                <TodoList list={this.state.list} handleRemove={this.handleRemove} />
+                <TodoList list={this.state.list} 
+                    handleRemove={this.handleRemove} 
+                    handleMarkAsDone={this.handleMarkAsDone} 
+                    handleMarkAsPending={this.handleMarkAsPending} 
+                    />
             </div>
         )
     }
